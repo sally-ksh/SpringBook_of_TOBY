@@ -1,4 +1,4 @@
-package ch01.refactor;
+package ch01.concernz;
 
 public class User {
 	private String id;

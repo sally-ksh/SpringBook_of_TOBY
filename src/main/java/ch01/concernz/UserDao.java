@@ -1,4 +1,4 @@
-package ch01.refactor;
+package ch01.concernz;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
