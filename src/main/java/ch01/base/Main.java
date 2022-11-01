@@ -1,4 +1,4 @@
-package ch01;
+package ch01.base;
 
 import java.sql.SQLException;
 

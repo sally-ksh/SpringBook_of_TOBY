@@ -1,4 +1,4 @@
-package ch01;
+package ch01.base;
 
 public class User {
 	private String id;
