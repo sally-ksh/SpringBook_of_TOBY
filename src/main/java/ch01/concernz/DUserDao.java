@@ -1,10 +1,10 @@
-package ch01.refactor;
+package ch01.concernz;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-public class NUserDao extends UserDao{
+public class DUserDao extends UserDao{
 	@Override
 	public Connection getConnection() throws ClassNotFoundException, SQLException {
 		Class.forName("com.mysql.cj.jdbc.Driver");
