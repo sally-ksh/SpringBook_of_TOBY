@@ -9,7 +9,7 @@ public class NConnectionMaker implements ConnectionMaker {
 	public Connection makeConnection() throws ClassNotFoundException, SQLException {
 		Class.forName("com.mysql.cj.jdbc.Driver");
 		Connection connection = DriverManager.getConnection(
-			"jdbc:mysql://localhost/logindb", "sally", "sally2022"
+			"jdbc:mysql://localhost/database-name", "id", "password"
 		);
 		return connection;
 	}
