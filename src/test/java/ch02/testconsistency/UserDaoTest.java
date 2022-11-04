@@ -15,18 +15,22 @@ class UserDaoTest {
 		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(DaoFactory.class);
 
 		UserDao dao = context.getBean("userDao", UserDao.class);
+		User expectedA = new User("sally", "sallysh", "study");
+		User expectedB = new User("sally2", "sallysh2", "study2");
 
 		dao.deleteAll();
 		assertThat(dao.getCount()).isZero();
 
-		User expected = new User("sally", "sallysh", "study");
-		dao.add(expected);
+		dao.add(expectedA);
+		dao.add(expectedB);
+		assertThat(dao.getCount()).isGreaterThan(1);
 
-		assertThat(dao.getCount()).isOne();
+		User actualA = dao.get(expectedA.getId());
+		assertThat(actualA.getName()).isEqualTo(actualA.getName());
+		assertThat(actualA.getPassword()).isEqualTo(actualA.getPassword());
 
-		User actual = dao.get(expected.getId());
-
-		assertThat(actual.getName()).isEqualTo(expected.getName());
-		assertThat(actual.getPassword()).isEqualTo(expected.getPassword());
+		User actualB = dao.get(expectedB.getId());
+		assertThat(actualB.getName()).isEqualTo(actualB.getName());
+		assertThat(actualB.getPassword()).isEqualTo(actualB.getPassword());
 	}
 }
