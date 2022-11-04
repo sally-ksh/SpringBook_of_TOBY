@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.dao.EmptyResultDataAccessException;
 
 import java.sql.SQLException;
 
@@ -46,6 +47,6 @@ class UserDaoTest {
 		assertThat(dao.getCount()).isZero();
 
 		assertThatThrownBy(() -> dao.get("unknownId"))
-			.isInstanceOf(SQLException.class);
+			.isInstanceOf(EmptyResultDataAccessException.class);
 	}
 }

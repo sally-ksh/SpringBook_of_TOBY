@@ -1,9 +1,12 @@
 package ch02.testconsistency;
 
+import org.springframework.dao.EmptyResultDataAccessException;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Objects;
 
 import javax.sql.DataSource;
 
@@ -39,17 +42,22 @@ public class UserDao {
 		prepareStatement.setString(1, id);
 
 		ResultSet resultSet = prepareStatement.executeQuery();
-		resultSet.next();
-			User user = new User(
-			resultSet.getString("id"),
-			resultSet.getString("name"),
-			resultSet.getString("password")
-		);
+
+		User user = null;
+		if (resultSet.next()) {
+			user = new User(
+				resultSet.getString("id"),
+				resultSet.getString("name"),
+				resultSet.getString("password"));
+		}
 
 		resultSet.close();
 		prepareStatement.close();
 		connection.close();
 
+		if (Objects.isNull(user)) {
+			throw new EmptyResultDataAccessException(1);
+		}
 		return user;
 	}
 
