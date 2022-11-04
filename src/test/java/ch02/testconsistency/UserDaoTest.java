@@ -6,20 +6,26 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.dao.EmptyResultDataAccessException;
 
 import java.sql.SQLException;
 
+@SpringBootTest(classes = DaoFactory.class)
 class UserDaoTest {
+	@Autowired
 	private UserDao dao;
 	private User userA;  // fixture
 	private User userB;
 
 	@BeforeEach
 	void beforeEach() {
-		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(DaoFactory.class);
-		dao = context.getBean("userDao", UserDao.class);
+		System.out.println(this.dao);
+		System.out.println(this);
+		// AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(DaoFactory.class);
+		// dao = context.getBean("userDao", UserDao.class);
 		userA = new User("sally", "sallysh", "study");
 		userB = new User("sally2", "sallysh2", "study2");
 	}
