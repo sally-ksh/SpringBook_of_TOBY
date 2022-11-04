@@ -1,6 +1,7 @@
 package ch02.testconsistency;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
@@ -32,5 +33,19 @@ class UserDaoTest {
 		User actualB = dao.get(expectedB.getId());
 		assertThat(actualB.getName()).isEqualTo(actualB.getName());
 		assertThat(actualB.getPassword()).isEqualTo(actualB.getPassword());
+	}
+
+	@Test
+	void getUserFailure() throws SQLException, ClassNotFoundException {
+		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(DaoFactory.class);
+
+		UserDao dao = context.getBean("userDao", UserDao.class);
+		User expected = new User("sally", "sallysh", "study");
+
+		dao.deleteAll();
+		assertThat(dao.getCount()).isZero();
+
+		assertThatThrownBy(() -> dao.get("unknownId"))
+			.isInstanceOf(SQLException.class);
 	}
 }
