@@ -1,4 +1,4 @@
-package ch02.testconsistency;
+package ch03.exceptionz;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,6 +20,7 @@ public class DaoFactory {
 		dataSource.setUrl("jdbc:mysql://localhost/database-name");
 		dataSource.setUsername("id");
 		dataSource.setPassword("password");
+
 		return dataSource;
 	}
 }
