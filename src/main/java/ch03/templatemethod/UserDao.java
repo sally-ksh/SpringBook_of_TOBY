@@ -12,7 +12,7 @@ import javax.sql.DataSource;
 
 import ch03.exceptionz.User;
 
-public class UserDao {
+public abstract class UserDao {
 	private final DataSource dataSource;
 
 	public UserDao(DataSource dataSource) {
@@ -25,7 +25,7 @@ public class UserDao {
 
 		try {
 			connection = dataSource.getConnection();
-			preparedStatement = makeStatementAdd(connection);
+			preparedStatement = makeStatement(connection);
 			preparedStatement.setString(1, user.getId());
 			preparedStatement.setString(2, user.getName());
 			preparedStatement.setString(3, user.getPassword());
@@ -58,7 +58,7 @@ public class UserDao {
 
 		try {
 			connection = dataSource.getConnection();
-			preparedStatement = makeStatementGet(connection);
+			preparedStatement = makeStatement(connection);
 			preparedStatement.setString(1, id);
 
 			resultSet = preparedStatement.executeQuery();
@@ -103,7 +103,7 @@ public class UserDao {
 
 		try {
 			connection = dataSource.getConnection();
-			preparedStatement = makeStatementDeleteAll(connection);
+			preparedStatement = makeStatement(connection);
 			preparedStatement.executeUpdate();
 		} catch (SQLException exception) {
 			throw exception;
@@ -131,7 +131,7 @@ public class UserDao {
 
 		try {
 			connection = dataSource.getConnection();
-			preparedStatement = makeStatementCount(connection);
+			preparedStatement = makeStatement(connection);
 			resultSet = preparedStatement.executeQuery();
 			resultSet.next();
 			return resultSet.getInt(1);
@@ -159,23 +159,5 @@ public class UserDao {
 		}
 	}
 
-	private PreparedStatement makeStatementDeleteAll(Connection connection) throws SQLException {
-		return connection.prepareStatement("delete from users");
-	}
-
-	private PreparedStatement makeStatementCount(Connection connection) throws SQLException {
-		return connection.prepareStatement("select count(*) from users");
-	}
-
-	private PreparedStatement makeStatementGet(Connection connection) throws SQLException {
-		return connection.prepareStatement(
-			"select id, name, password from users where id = ?"
-		);
-	}
-
-	private PreparedStatement makeStatementAdd(Connection connection) throws SQLException {
-		return connection.prepareStatement(
-			"insert into users(id,name, password) values (?,?,?)"
-		);
-	}
+	abstract protected PreparedStatement makeStatement(Connection connection) throws SQLException;
 }
