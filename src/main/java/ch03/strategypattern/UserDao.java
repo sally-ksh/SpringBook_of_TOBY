@@ -20,14 +20,8 @@ public class UserDao {
 	}
 
 	// 클래스 -> 로컬클래스 -> 익명 클래스
-	public void add(User user) throws ClassNotFoundException, SQLException {
+	public void add(final User user) throws ClassNotFoundException, SQLException {
 		class AddStatement implements StatementStrategy {
-			private final User user;
-
-			public AddStatement(User user) {
-				this.user = user;
-			}
-
 			@Override
 			public PreparedStatement makePreparedStatement(Connection connection) throws SQLException {
 				PreparedStatement preparedStatement = connection.prepareStatement(
@@ -39,7 +33,7 @@ public class UserDao {
 				return preparedStatement;
 			}
 		}
-		StatementStrategy statementStrategy = new AddStatement(user);
+		StatementStrategy statementStrategy = new AddStatement();
 		jdbcContextWithStatementStrategy(statementStrategy);
 	}
 
