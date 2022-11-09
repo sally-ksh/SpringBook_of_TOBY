@@ -20,36 +20,8 @@ public class UserDao {
 	}
 
 	public void add(User user) throws ClassNotFoundException, SQLException {
-		Connection connection = null;
-		PreparedStatement preparedStatement = null;
-
-		try {
-			connection = dataSource.getConnection();
-			StatementStrategy statementStrategy = new UserDaoAdd();
-			preparedStatement = statementStrategy.makePreparedStatement(connection);
-			preparedStatement.setString(1, user.getId());
-			preparedStatement.setString(2, user.getName());
-			preparedStatement.setString(3, user.getPassword());
-
-			preparedStatement.executeUpdate();
-
-		} catch (SQLException exception) {
-			throw exception;
-		} finally {
-			if (preparedStatement != null) {
-				try {
-					preparedStatement.close();
-				} catch (SQLException e) {
-				}
-			}
-			if (connection != null) {
-				try {
-					connection.close();
-				} catch (SQLException e) {
-
-				}
-			}
-		}
+		StatementStrategy statementStrategy = new AddStatement(user);
+		jdbcContextWithStatementStrategy(statementStrategy);
 	}
 
 	public User get(String id) throws ClassNotFoundException, SQLException {
