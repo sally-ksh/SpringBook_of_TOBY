@@ -19,11 +19,10 @@ public class UserDao {
 		this.dataSource = dataSource;
 	}
 
-	// 클래스 -> 로컬클래스 -> 익명 클래스
+	// 클래스 -> 로컬클래스 -> 익명 클래스 -> 람다
 	public void add(final User user) throws ClassNotFoundException, SQLException {
-		jdbcContextWithStatementStrategy(new StatementStrategy() {
-			@Override
-			public PreparedStatement makePreparedStatement(Connection connection) throws SQLException {
+		jdbcContextWithStatementStrategy((Connection connection) -> {
+			 {
 				PreparedStatement preparedStatement = connection.prepareStatement(
 					"insert into users(id,name, password) values (?,?,?)"
 				);
@@ -83,12 +82,7 @@ public class UserDao {
 	}
 
 	public void deleteAll() throws SQLException {
-		jdbcContextWithStatementStrategy(new StatementStrategy() {
-			@Override
-			public PreparedStatement makePreparedStatement(Connection connection) throws SQLException {
-				return connection.prepareStatement("delete from users");
-			}
-		});
+		jdbcContextWithStatementStrategy((Connection connection) -> connection.prepareStatement("delete from users"));
 	}
 
 	public int getCount() throws SQLException {
