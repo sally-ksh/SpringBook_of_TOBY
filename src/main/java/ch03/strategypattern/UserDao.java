@@ -19,7 +19,26 @@ public class UserDao {
 		this.dataSource = dataSource;
 	}
 
+	// 클래스 -> 로컬클래스 -> 익명 클래스
 	public void add(User user) throws ClassNotFoundException, SQLException {
+		class AddStatement implements StatementStrategy {
+			private final User user;
+
+			public AddStatement(User user) {
+				this.user = user;
+			}
+
+			@Override
+			public PreparedStatement makePreparedStatement(Connection connection) throws SQLException {
+				PreparedStatement preparedStatement = connection.prepareStatement(
+					"insert into users(id,name, password) values (?,?,?)"
+				);
+				preparedStatement.setString(1, user.getId());
+				preparedStatement.setString(2, user.getName());
+				preparedStatement.setString(3, user.getPassword());
+				return preparedStatement;
+			}
+		}
 		StatementStrategy statementStrategy = new AddStatement(user);
 		jdbcContextWithStatementStrategy(statementStrategy);
 	}
