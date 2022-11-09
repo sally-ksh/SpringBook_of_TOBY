@@ -6,13 +6,9 @@ import java.sql.SQLException;
 
 import javax.sql.DataSource;
 
-public class UserDaoAdd extends UserDao {
-	public UserDaoAdd(DataSource dataSource) {
-		super(dataSource);
-	}
-
+public class UserDaoAdd implements StatementStrategy {
 	@Override
-	protected PreparedStatement makeStatement(Connection connection) throws SQLException {
+	public PreparedStatement makePreparedStatement(Connection connection) throws SQLException {
 		return connection.prepareStatement(
 			"insert into users(id,name, password) values (?,?,?)"
 		);

@@ -12,7 +12,7 @@ import javax.sql.DataSource;
 
 import ch03.exceptionz.User;
 
-public abstract class UserDao {
+public class UserDao {
 	private final DataSource dataSource;
 
 	public UserDao(DataSource dataSource) {
@@ -25,7 +25,8 @@ public abstract class UserDao {
 
 		try {
 			connection = dataSource.getConnection();
-			preparedStatement = makeStatement(connection);
+			StatementStrategy statementStrategy = new UserDaoAdd();
+			preparedStatement = statementStrategy.makePreparedStatement(connection);
 			preparedStatement.setString(1, user.getId());
 			preparedStatement.setString(2, user.getName());
 			preparedStatement.setString(3, user.getPassword());
@@ -58,7 +59,8 @@ public abstract class UserDao {
 
 		try {
 			connection = dataSource.getConnection();
-			preparedStatement = makeStatement(connection);
+			StatementStrategy statementStrategy = new UserDaoGet();
+			preparedStatement = statementStrategy.makePreparedStatement(connection);
 			preparedStatement.setString(1, id);
 
 			resultSet = preparedStatement.executeQuery();
@@ -103,7 +105,8 @@ public abstract class UserDao {
 
 		try {
 			connection = dataSource.getConnection();
-			preparedStatement = makeStatement(connection);
+			StatementStrategy statementStrategy = new UserDaoDeleteAll();
+			preparedStatement = statementStrategy.makePreparedStatement(connection);
 			preparedStatement.executeUpdate();
 		} catch (SQLException exception) {
 			throw exception;
@@ -131,7 +134,8 @@ public abstract class UserDao {
 
 		try {
 			connection = dataSource.getConnection();
-			preparedStatement = makeStatement(connection);
+			StatementStrategy statementStrategy = new UserDaoGetCount();
+			preparedStatement = statementStrategy.makePreparedStatement(connection);
 			resultSet = preparedStatement.executeQuery();
 			resultSet.next();
 			return resultSet.getInt(1);
@@ -158,6 +162,4 @@ public abstract class UserDao {
 			}
 		}
 	}
-
-	abstract protected PreparedStatement makeStatement(Connection connection) throws SQLException;
 }

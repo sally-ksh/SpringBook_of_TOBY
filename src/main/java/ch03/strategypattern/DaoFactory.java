@@ -9,23 +9,8 @@ import javax.sql.DataSource;
 @Configuration
 public class DaoFactory {
 	@Bean
-	public UserDao userDaoAdd() {
-		return new UserDaoAdd(dataSource());
-	}
-
-	@Bean
-	public UserDao userDaoDeleteAll() {
-		return new UserDaoDeleteAll(dataSource());
-	}
-
-	@Bean
-	public UserDao userDaoGet() {
-		return new UserDaoGet(dataSource());
-	}
-
-	@Bean
-	public UserDao userDaoGetCount() {
-		return new UserDaoGetCount(dataSource());
+	public UserDao userDao() {
+		return new UserDao(dataSource());
 	}
 
 	@Bean

@@ -4,15 +4,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-import javax.sql.DataSource;
-
-public class UserDaoGet extends UserDao {
-	public UserDaoGet(DataSource dataSource) {
-		super(dataSource);
-	}
-
+public class UserDaoGet implements StatementStrategy{
 	@Override
-	protected PreparedStatement makeStatement(Connection connection) throws SQLException {
+	public PreparedStatement makePreparedStatement(Connection connection) throws SQLException {
 		return connection.prepareStatement(
 			"select id, name, password from users where id = ?"
 		);
