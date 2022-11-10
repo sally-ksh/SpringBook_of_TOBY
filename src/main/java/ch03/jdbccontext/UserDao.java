@@ -23,7 +23,7 @@ public class UserDao {
 
 	// 클래스 -> 로컬클래스 -> 익명 클래스 -> 람다
 	public void add(final User user) throws ClassNotFoundException, SQLException {
-		jdbcContext.workWithStatementStrategyByUpdate((Connection connection) -> {
+		jdbcContext.workWithStatementStrategy((Connection connection) -> {
 			 {
 				PreparedStatement preparedStatement = connection.prepareStatement(
 					"insert into users(id,name, password) values (?,?,?)"
@@ -84,7 +84,7 @@ public class UserDao {
 	}
 
 	public void deleteAll() throws SQLException {
-		jdbcContext.workWithStatementStrategyByUpdate((Connection connection) -> connection.prepareStatement("delete from users"));
+		jdbcContext.executeSql("delete from users");
 	}
 
 	public int getCount() throws SQLException {

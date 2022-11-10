@@ -13,7 +13,12 @@ public class JdbcContext {
 		this.dataSource = dataSource;
 	}
 
-	public void workWithStatementStrategyByUpdate(StatementStrategy statementStrategy) throws SQLException {
+	// java 8 compiler add final keyword
+	public void executeSql(final String query) throws SQLException {
+		this.workWithStatementStrategy((Connection connection) -> connection.prepareStatement(query));
+	}
+
+	public void workWithStatementStrategy(StatementStrategy statementStrategy) throws SQLException {
 		Connection connection = null;
 		PreparedStatement preparedStatement = null;
 
