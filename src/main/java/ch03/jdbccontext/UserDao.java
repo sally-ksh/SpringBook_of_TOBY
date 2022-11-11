@@ -1,15 +1,11 @@
 package ch03.jdbccontext;
 
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.PreparedStatementCreator;
+import org.springframework.jdbc.core.RowMapper;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Objects;
 
 import javax.sql.DataSource;
 
@@ -17,6 +13,11 @@ import ch03.exceptionz.User;
 
 public class UserDao {
 	private final JdbcTemplate jdbcTemplate;
+	private RowMapper<User> userMapper = (ResultSet resultSet, int rowNum) -> {
+		return new User(
+			resultSet.getString("id"),
+			resultSet.getString("name"),
+			resultSet.getString("password"));};
 
 	public UserDao(DataSource dataSource) {
 		this.jdbcTemplate = new JdbcTemplate(dataSource);
@@ -34,12 +35,7 @@ public class UserDao {
 	public User get(String id) throws ClassNotFoundException, SQLException {
 		return this.jdbcTemplate.queryForObject(
 			"select id, name, password from users where id = ?", new Object[] {id},
-			(ResultSet resultSet, int rowNum) -> {
-				return new User(
-					resultSet.getString("id"),
-					resultSet.getString("name"),
-					resultSet.getString("password"));
-			});
+			this.userMapper);
 	}
 
 	public void deleteAll() throws SQLException {
@@ -62,12 +58,6 @@ public class UserDao {
 	public List<User> getAll() {
 		return this.jdbcTemplate.query(
 			"select * from users order by id",
-			(ResultSet resultSet, int rowNum) -> {
-				User user = new User(
-					resultSet.getString("id"),
-					resultSet.getString("name"),
-					resultSet.getString("password"));
-				return user;
-			});
+			this.userMapper);
 	}
 }
