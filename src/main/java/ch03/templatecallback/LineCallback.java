@@ -1,5 +1,5 @@
 package ch03.templatecallback;
 
-public interface LineCallback {
-	int doSomethingWithLines(String line, int value);
+public interface LineCallback<T> {
+	T doSomethingWithLines(String line, T value);
 }
