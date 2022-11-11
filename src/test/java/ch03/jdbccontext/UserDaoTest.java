@@ -11,6 +11,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.EmptyResultDataAccessException;
 
 import java.sql.SQLException;
+import java.util.List;
 
 import ch03.exceptionz.User;
 
@@ -52,5 +53,18 @@ class UserDaoTest {
 
 		assertThatThrownBy(() -> userDao.get("unknownId"))
 			.isInstanceOf(EmptyResultDataAccessException.class);
+	}
+
+	@Test
+	void getAll() throws SQLException, ClassNotFoundException {
+		userDao.deleteAll();
+		assertThat(userDao.getCount()).isZero();
+
+		userDao.add(userA);
+		userDao.add(userB);
+
+		List<User> users = userDao.getAll();
+
+		assertThat(users).contains(userA, userB);
 	}
 }
