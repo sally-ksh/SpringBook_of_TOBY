@@ -23,7 +23,7 @@ public class UserDao {
 		this.dataSource = dataSource;
 	}
 
-	public void add(User user) throws Throwable {
+	public void add(User user) throws DataAccessException {
 		Connection connection = null;
 		PreparedStatement preparedStatement = null;
 
@@ -38,7 +38,14 @@ public class UserDao {
 			preparedStatement.executeUpdate();
 
 		} catch (SQLException exception) {
-			// throw exception;  // 예외 회피
+			// JdbcTemplate
+			throw new DataAccessException("userDao", exception) {
+				@Override
+				public Throwable getRootCause() {
+					return super.getRootCause();
+				}
+			};
+	/*		// throw exception;  // 예외 회피
 			if (exception.getErrorCode() == MysqlErrorNumbers.ER_DUP_ENTRY) { // 예외 전환
 				// throw new DuplicateUserIdException();
 				// throw new DuplicateUserIdException(exception);
@@ -46,7 +53,7 @@ public class UserDao {
 			} else {
 				// throw exception;  // 그 외 경우는 SQLException 그대로
 				throw new RuntimeException(exception);  // 예외 포장
-			}
+			}*/
 		} finally {
 			if (preparedStatement != null) {
 				try {
