@@ -1,28 +1,33 @@
-package ch04.jdbccontext;
-
-import com.mysql.cj.exceptions.MysqlErrorNumbers;
+package ch04.jdbccontext.exceptiontranslation;
 
 import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.EmptyResultDataAccessException;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Objects;
 
 import javax.sql.DataSource;
 
 import ch03.exceptionz.User;
+import ch04.jdbccontext.StatementStrategy;
+import ch04.jdbccontext.UserDaoAdd;
+import ch04.jdbccontext.UserDaoDeleteAll;
+import ch04.jdbccontext.UserDaoGet;
+import ch04.jdbccontext.UserDaoGetCount;
 
-public class UserDao {
+public class UserDaoJdbc implements UserDao{
 	private final DataSource dataSource;
 
-	public UserDao(DataSource dataSource) {
+	public UserDaoJdbc(DataSource dataSource) {
 		this.dataSource = dataSource;
 	}
 
-	public void add(User user) throws DataAccessException {
+	public void add(User user) throws DuplicateKeyException {
 		Connection connection = null;
 		PreparedStatement preparedStatement = null;
 
@@ -37,22 +42,7 @@ public class UserDao {
 			preparedStatement.executeUpdate();
 
 		} catch (SQLException exception) {
-			// JdbcTemplate
-			throw new DataAccessException("userDao", exception) {
-				@Override
-				public Throwable getRootCause() {
-					return super.getRootCause();
-				}
-			};
-	/*		// throw exception;  // 예외 회피
-			if (exception.getErrorCode() == MysqlErrorNumbers.ER_DUP_ENTRY) { // 예외 전환
-				// throw new DuplicateUserIdException();
-				// throw new DuplicateUserIdException(exception);
-				throw new DuplicateUserIdException().initCause(exception);
-			} else {
-				// throw exception;  // 그 외 경우는 SQLException 그대로
-				throw new RuntimeException(exception);  // 예외 포장
-			}*/
+			throw new DuplicateKeyException("userDao", exception);
 		} finally {
 			if (preparedStatement != null) {
 				try {
@@ -70,7 +60,7 @@ public class UserDao {
 		}
 	}
 
-	public User get(String id) throws SQLException {
+	public User get(String id) {
 		Connection connection = null;
 		PreparedStatement preparedStatement = null;
 		ResultSet resultSet = null;
@@ -94,7 +84,12 @@ public class UserDao {
 			}
 			return user;
 		} catch (SQLException exception) {
-			throw exception;
+			throw new DataAccessException("userDao", exception) {
+				@Override
+				public Throwable getRootCause() {
+					return super.getRootCause();
+				}
+			};
 		} finally {
 			if (resultSet != null) {
 				try {
@@ -117,7 +112,7 @@ public class UserDao {
 		}
 	}
 
-	public void deleteAll() throws SQLException {
+	public void deleteAll() {
 		Connection connection = null;
 		PreparedStatement preparedStatement = null;
 
@@ -127,7 +122,12 @@ public class UserDao {
 			preparedStatement = statementStrategy.makePreparedStatement(connection);
 			preparedStatement.executeUpdate();
 		} catch (SQLException exception) {
-			throw exception;
+			throw new DataAccessException("userDao", exception) {
+				@Override
+				public Throwable getRootCause() {
+					return super.getRootCause();
+				}
+			};
 		} finally {
 			if (preparedStatement != null) {
 				try {
@@ -145,7 +145,7 @@ public class UserDao {
 		}
 	}
 
-	public int getCount() throws SQLException {
+	public int getCount() {
 		Connection connection = null;
 		PreparedStatement preparedStatement = null;
 		ResultSet resultSet = null;
@@ -158,7 +158,12 @@ public class UserDao {
 			resultSet.next();
 			return resultSet.getInt(1);
 		} catch (SQLException exception) {
-			throw exception;
+			throw new DataAccessException("userDao", exception) {
+				@Override
+				public Throwable getRootCause() {
+					return super.getRootCause();
+				}
+			};
 		} finally {
 			if (resultSet != null) {
 				try {
