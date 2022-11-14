@@ -4,7 +4,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -24,7 +23,7 @@ public class UserDao {
 	}
 
 	// 클래스 -> 로컬클래스 -> 익명 클래스 -> 람다
-	public void add(final User user) throws ClassNotFoundException, SQLException {
+	public void add(final User user) {
 		this.jdbcTemplate.update(
 			"insert into users(id,name, password) values (?,?,?)",
 			user.getId(),
@@ -32,20 +31,20 @@ public class UserDao {
 			user.getPassword());;
 	}
 
-	public User get(String id) throws ClassNotFoundException, SQLException {
+	public User get(String id) {
 		return this.jdbcTemplate.queryForObject(
 			"select id, name, password from users where id = ?", new Object[] {id},
 			this.userMapper);
 	}
 
-	public void deleteAll() throws SQLException {
+	public void deleteAll() {
 		this.jdbcTemplate.update("delete from users");  // 내장 콜백 사용 메소드 호출
 		/*this.jdbcTemplate.update((Connection connection) -> {
 			return connection.prepareStatement("delete from users");
 		});*/
 	}
 
-	public int getCount() throws SQLException {
+	public int getCount() {
 		/*return this.jdbcTemplate.query((Connection connection) -> {
 			return connection.prepareStatement("select count(*) from users");
 		}, (ResultSet resultSet) -> {
