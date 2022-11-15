@@ -8,7 +8,6 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-
 public class UserDaoJdbc implements UserDao {
 	private final JdbcTemplate jdbcTemplate;
 	private RowMapper<User> userMapper = (ResultSet resultSet, int rowNum) -> {

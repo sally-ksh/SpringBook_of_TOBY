@@ -90,4 +90,8 @@ public class User {
 	public int hashCode() {
 		return Objects.hash(id, name, password);
 	}
+
+	public void upgrade(Level upgraded) {
+		this.level = upgraded;
+	}
 }
