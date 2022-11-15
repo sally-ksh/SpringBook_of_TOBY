@@ -27,6 +27,15 @@ public class User {
 		this.recommend = recommend;
 	}
 
+	public void upgradeLevel() {
+		Level nextLevel = this.level.nextLevel();
+		if (Objects.isNull(nextLevel)) {
+			throw new IllegalStateException(this.level + "은 업그레이드가 불가능 합니다.");
+		} else {
+			this.level = nextLevel;
+		}
+	}
+
 	public String getId() {
 		return id;
 	}
@@ -89,9 +98,5 @@ public class User {
 	@Override
 	public int hashCode() {
 		return Objects.hash(id, name, password);
-	}
-
-	public void upgrade(Level upgraded) {
-		this.level = upgraded;
 	}
 }
