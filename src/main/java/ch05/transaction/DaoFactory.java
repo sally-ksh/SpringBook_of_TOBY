@@ -10,7 +10,7 @@ import javax.sql.DataSource;
 public class DaoFactory {
 	@Bean
 	public UserService userService() {
-		return new UserService(userDao(), userLevelUpgradePolicy());
+		return new UserService(userDao(), userLevelUpgradePolicy(), dataSource());
 	}
 
 	@Bean
