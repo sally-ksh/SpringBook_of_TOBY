@@ -13,10 +13,15 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.Map;
 
+import javax.sql.DataSource;
+
 @SpringBootTest(classes = MyDaoFactory.class)
 class UserServiceTest {
 	@Autowired
 	UserDao userDao;
+
+	@Autowired
+	DataSource dataSource;
 
 	private Map<Integer, User> users;
 
@@ -33,7 +38,7 @@ class UserServiceTest {
 
 	@Test
 	void upgradeAllOrNothing() {
-		UserService testUserService = new UserService(this.userDao, new TestUserLevelUpgrade(users.get(3).getId()));
+		UserService testUserService = new UserService(this.userDao, new TestUserLevelUpgrade(users.get(3).getId()), dataSource);
 
 		userDao.deleteAll();
 		users.values().forEach(userDao::add);
