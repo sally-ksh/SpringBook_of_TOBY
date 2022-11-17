@@ -9,7 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.sql.SQLException;
 
-@SpringBootTest(classes = MyDaoFactory.class)
+@SpringBootTest(classes = DaoFactory.class)
 class UserDaoTest {
 	@Autowired
 	private UserDao userDao;

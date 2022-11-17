@@ -15,7 +15,7 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
-@SpringBootTest(classes = MyDaoFactory.class)
+@SpringBootTest(classes = DaoFactory.class)
 class UserServiceTest {
 	@Autowired
 	UserDao userDao;

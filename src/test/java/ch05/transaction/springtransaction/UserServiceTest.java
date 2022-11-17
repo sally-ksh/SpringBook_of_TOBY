@@ -15,12 +15,12 @@ import java.util.Map;
 import javax.sql.DataSource;
 
 import ch05.transaction.Level;
-import ch05.transaction.MyDaoFactory;
 import ch05.transaction.User;
 import ch05.transaction.UserDao;
 import ch05.transaction.UserLevelUpgradePolicy;
+import ch05.transaction.email.DaoFactory;
 
-@SpringBootTest(classes = MyDaoFactory.class)
+@SpringBootTest(classes = DaoFactory.class)
 class UserServiceTest {
 	@Autowired
 	UserDao userDao;
