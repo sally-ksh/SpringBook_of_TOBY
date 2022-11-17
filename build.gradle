@@ -13,6 +13,9 @@ repositories {
 }
 
 dependencies {
+    // https://mvnrepository.com/artifact/jakarta.mail/jakarta.mail-api
+//    implementation group: 'jakarta.mail', name: 'jakarta.mail-api', version: '2.1.0'
+//    implementation 'org.springframework.boot:spring-boot-starter-mail'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-jdbc'
     implementation group: 'mysql', name: 'mysql-connector-java', version: '8.0.28'
