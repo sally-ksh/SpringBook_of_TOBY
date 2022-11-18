@@ -19,7 +19,7 @@ import javax.sql.DataSource;
 
 import ch05.transaction.Level;
 
-@SpringBootTest(classes = MyDaoFactory.class)
+@SpringBootTest(classes = DaoFactory.class)
 class UserServiceTest {
 	@Autowired
 	UserDao userDao;
