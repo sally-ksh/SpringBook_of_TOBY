@@ -15,6 +15,8 @@ import org.springframework.transaction.PlatformTransactionManager;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import javax.sql.DataSource;
 
@@ -23,6 +25,12 @@ import ch05.transaction.UserService;
 
 @SpringBootTest(classes = MyDaoFactory.class)
 class UserServiceTest {
+	@Autowired
+	UserServiceImpl userService;
+
+	@Autowired
+	UserLevelUpgradePolicy userLevelUpgradePolicy;
+
 	@Autowired
 	UserDao userDao;
 
@@ -56,7 +64,72 @@ class UserServiceTest {
 
 		assertThrows(TestUserServiceException.class, () -> userServiceTransaction.upgradeLevels());
 		checkLevelUpgraded(users.get(1), false);  // 예외 발생선 레벨 변경 원복 확인
+	}
 
+	@Test
+	void upgradeLevels() {
+		MockMailSender mockMailSender = new MockMailSender();
+		UserServiceImpl userService = new UserServiceImpl(dataSource, transactionManager, new MockUserDao(mapToUserList()), userLevelUpgradePolicy, mockMailSender);
+
+		userDao.deleteAll();
+		users.values().forEach(userDao::add);
+
+		userService.upgradeLevels();
+
+		List<String> requests = mockMailSender.getRequests();
+		assertThat(requests.size()).isEqualTo(2);
+		assertThat(requests.get(0)).isEqualTo(users.get(1).getEmail());
+		assertThat(requests.get(1)).isEqualTo(users.get(3).getEmail());
+
+	}
+
+	private List<User> mapToUserList() {
+		return IntStream.range(0, 5)
+			.mapToObj(key -> users.get(key))
+			.collect(Collectors.toList());
+	}
+
+	static class MockUserDao implements UserDao {
+		private final List<User> users;
+		private List<User> updated = new ArrayList<>();
+
+		public MockUserDao(List<User> users) {
+			this.users = users;
+		}
+
+		public List<User> getUpdated() {
+			return this.updated;
+		}
+
+		@Override
+		public void add(User user) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public User get(String id) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public void deleteAll() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public int getCount() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public void update(User user) {
+			updated.add(user);
+		}
+
+		@Override
+		public List<User> getAll() {
+			return this.users;
+		}
 	}
 
 	static class TestUserLevelUpgrade implements UserLevelUpgradePolicy {
