@@ -2,12 +2,18 @@ package ch06.separateTransaction;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import static ch06.separateTransaction.UserServiceImpl.MIN_LOG_COUNT_FOR_SILVER;
 import static ch06.separateTransaction.UserServiceImpl.MIN_RECOMMEND_FOR_GOLD;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -81,6 +87,30 @@ class UserServiceTest {
 		assertThat(requests.get(0)).isEqualTo(users.get(1).getEmail());
 		assertThat(requests.get(1)).isEqualTo(users.get(3).getEmail());
 
+	}
+
+	@Test
+	void mockUpgradeLevels() {
+		UserDao mockUserDao = mock(UserDao.class);
+		MailSender mockMailSender = mock(MailSender.class);
+		when(mockUserDao.getAll()).thenReturn(mapToUserList());
+		UserServiceImpl userService = new UserServiceImpl(dataSource, transactionManager, mockUserDao, userLevelUpgradePolicy, mockMailSender);
+
+		userService.upgradeLevels();
+
+		verify(mockUserDao, times(2)).update(any(User.class));
+		verify(mockUserDao, times(2)).update(any(User.class));
+		verify(mockUserDao).update(users.get(1));
+		assertThat(users.get(1).getLevel() == Level.SILVER).isTrue();
+		verify(mockUserDao).update(users.get(3));
+		assertThat(users.get(3).getLevel() == Level.GOLD).isTrue();
+
+		ArgumentCaptor<SimpleMailMessage> mailMessageArgumentCaptor = ArgumentCaptor.forClass(SimpleMailMessage.class);
+		verify(mockMailSender, times(2)).send(mailMessageArgumentCaptor.capture());
+
+		List<SimpleMailMessage> mailMessages = mailMessageArgumentCaptor.getAllValues();
+		assertThat(mailMessages.get(0).getTo()).isEqualTo(users.get(1).getEmail());
+		assertThat(mailMessages.get(1).getTo()).isEqualTo(users.get(3).getEmail());
 	}
 
 	private List<User> mapToUserList() {
