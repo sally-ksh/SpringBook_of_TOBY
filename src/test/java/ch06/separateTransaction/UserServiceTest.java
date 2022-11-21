@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.PlatformTransactionManager;
 
+import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -27,7 +28,6 @@ import java.util.stream.IntStream;
 import javax.sql.DataSource;
 
 import ch05.transaction.Level;
-import ch05.transaction.UserService;
 
 @SpringBootTest(classes = MyDaoFactory.class)
 class UserServiceTest {
@@ -111,6 +111,23 @@ class UserServiceTest {
 		List<SimpleMailMessage> mailMessages = mailMessageArgumentCaptor.getAllValues();
 		assertThat(mailMessages.get(0).getTo()).isEqualTo(users.get(1).getEmail());
 		assertThat(mailMessages.get(1).getTo()).isEqualTo(users.get(3).getEmail());
+	}
+
+	@Test
+	void upgradeAllOrNothingByDynamicProxyCh06() {
+		UserServiceTest.MockMailSender mockMailSender = new UserServiceTest.MockMailSender();
+		UserServiceImpl userService = new UserServiceImpl(dataSource, transactionManager, userDao, new TestUserLevelUpgrade(users.get(3).getId()), mockMailSender);
+
+		TransactionHandler transactionHandler = new TransactionHandler(userService, transactionManager, "upgradeLevels");
+
+		UserService proxyInstance = (UserService)Proxy.newProxyInstance(getClass().getClassLoader(), new Class[] {
+			UserService.class}, transactionHandler);
+
+		userDao.deleteAll();
+		users.values().forEach(userDao::add);
+
+		assertThrows(TestUserServiceException.class, () -> proxyInstance.upgradeLevels());
+		checkLevelUpgraded(users.get(1), false);  // 예외 발생선 레벨 변경 원복 확인
 	}
 
 	private List<User> mapToUserList() {

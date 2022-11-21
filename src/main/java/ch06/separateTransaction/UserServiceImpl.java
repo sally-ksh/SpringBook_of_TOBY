@@ -12,9 +12,6 @@ import javax.sql.DataSource;
 import ch05.transaction.Level;
 
 public class UserServiceImpl implements UserService {
-	public static final int MIN_LOG_COUNT_FOR_SILVER = 50;
-	public static final int MIN_RECOMMEND_FOR_GOLD = 30;
-
 	private final DataSource dataSource;
 	private final PlatformTransactionManager transactionManager;
 	private final UserDao userDao;
