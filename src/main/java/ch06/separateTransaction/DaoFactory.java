@@ -17,12 +17,17 @@ public class DaoFactory {
 
 	@Bean
 	public UserService userService() {
-		return new UserServiceTransaction(userServiceImpl(), transactionManager());
+		// return new UserServiceTransaction(userServiceImpl(), transactionManager());
+		return (UserService)new TransactionFactoryBean(
+			userServiceImpl(),
+			transactionManager(),
+			"upgradeLevels",
+			UserService.class);
 	}
 
 	@Bean
 	public UserServiceImpl userServiceImpl() {
-		return new UserServiceImpl( dataSource(), transactionManager(), userDao(), userLevelUpgradePolicy(),mailSender());
+		return new UserServiceImpl(userDao(), userLevelUpgradePolicy(),mailSender());
 	}
 
 	@Bean
