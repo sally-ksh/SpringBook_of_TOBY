@@ -12,17 +12,12 @@ import javax.sql.DataSource;
 import ch05.transaction.Level;
 
 public class UserServiceImpl implements UserService {
-	private final DataSource dataSource;
-	private final PlatformTransactionManager transactionManager;
 	private final UserDao userDao;
 	private final UserLevelUpgradePolicy userLevelUpgradePolicy;
 
 	private final MailSender mailSender;
 
-	public UserServiceImpl(DataSource dataSource, PlatformTransactionManager transactionManager,
-		UserDao userDao, UserLevelUpgradePolicy userLevelUpgradePolicy, MailSender mailSender) {
-		this.dataSource = dataSource;
-		this.transactionManager = transactionManager;
+	public UserServiceImpl(UserDao userDao, UserLevelUpgradePolicy userLevelUpgradePolicy, MailSender mailSender) {
 		this.userDao = userDao;
 		this.userLevelUpgradePolicy = userLevelUpgradePolicy;
 		this.mailSender = mailSender;
