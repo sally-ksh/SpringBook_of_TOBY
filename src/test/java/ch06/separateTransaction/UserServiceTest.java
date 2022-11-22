@@ -16,6 +16,10 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import java.lang.reflect.Proxy;
@@ -30,10 +34,8 @@ import javax.sql.DataSource;
 import ch05.transaction.Level;
 
 @SpringBootTest(classes = MyDaoFactory.class)
+// @ContextConfiguration(classes = MyDaoFactory.class)
 class UserServiceTest {
-	@Autowired
-	UserServiceImpl userService;
-
 	@Autowired
 	UserLevelUpgradePolicy userLevelUpgradePolicy;
 
@@ -45,6 +47,9 @@ class UserServiceTest {
 
 	@Autowired
 	PlatformTransactionManager transactionManager;
+
+	// @Autowired
+	// AnnotationConfigApplicationContext context;
 
 	private Map<Integer, User> users;
 
@@ -62,7 +67,7 @@ class UserServiceTest {
 	@Test
 	void upgradeAllOrNothing() {
 		UserServiceTest.MockMailSender mockMailSender = new UserServiceTest.MockMailSender();
-		UserServiceImpl userService = new UserServiceImpl(dataSource, transactionManager, userDao, new TestUserLevelUpgrade(users.get(3).getId()), mockMailSender);
+		UserServiceImpl userService = new UserServiceImpl(userDao, new TestUserLevelUpgrade(users.get(3).getId()), mockMailSender);
 		UserServiceTransaction userServiceTransaction = new UserServiceTransaction(userService, transactionManager);
 
 		userDao.deleteAll();
@@ -75,7 +80,7 @@ class UserServiceTest {
 	@Test
 	void upgradeLevels() {
 		MockMailSender mockMailSender = new MockMailSender();
-		UserServiceImpl userService = new UserServiceImpl(dataSource, transactionManager, new MockUserDao(mapToUserList()), userLevelUpgradePolicy, mockMailSender);
+		UserServiceImpl userService = new UserServiceImpl(new MockUserDao(mapToUserList()), userLevelUpgradePolicy, mockMailSender);
 
 		userDao.deleteAll();
 		users.values().forEach(userDao::add);
@@ -94,7 +99,7 @@ class UserServiceTest {
 		UserDao mockUserDao = mock(UserDao.class);
 		MailSender mockMailSender = mock(MailSender.class);
 		when(mockUserDao.getAll()).thenReturn(mapToUserList());
-		UserServiceImpl userService = new UserServiceImpl(dataSource, transactionManager, mockUserDao, userLevelUpgradePolicy, mockMailSender);
+		UserServiceImpl userService = new UserServiceImpl(mockUserDao, userLevelUpgradePolicy, mockMailSender);
 
 		userService.upgradeLevels();
 
@@ -111,23 +116,6 @@ class UserServiceTest {
 		List<SimpleMailMessage> mailMessages = mailMessageArgumentCaptor.getAllValues();
 		assertThat(mailMessages.get(0).getTo()).isEqualTo(users.get(1).getEmail());
 		assertThat(mailMessages.get(1).getTo()).isEqualTo(users.get(3).getEmail());
-	}
-
-	@Test
-	void upgradeAllOrNothingByDynamicProxyCh06() {
-		UserServiceTest.MockMailSender mockMailSender = new UserServiceTest.MockMailSender();
-		UserServiceImpl userService = new UserServiceImpl(dataSource, transactionManager, userDao, new TestUserLevelUpgrade(users.get(3).getId()), mockMailSender);
-
-		TransactionHandler transactionHandler = new TransactionHandler(userService, transactionManager, "upgradeLevels");
-
-		UserService proxyInstance = (UserService)Proxy.newProxyInstance(getClass().getClassLoader(), new Class[] {
-			UserService.class}, transactionHandler);
-
-		userDao.deleteAll();
-		users.values().forEach(userDao::add);
-
-		assertThrows(TestUserServiceException.class, () -> proxyInstance.upgradeLevels());
-		checkLevelUpgraded(users.get(1), false);  // 예외 발생선 레벨 변경 원복 확인
 	}
 
 	private List<User> mapToUserList() {
